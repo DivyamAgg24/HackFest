@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Diffusion Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+    }
+    .file-upload {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Diffusion Model File Upload</h1>
+    <p>Upload a .h5 file to generate images!</p>
+    
+    <input type="file" id="fileInput" class="file-upload" accept=".h5" />
+    <button onclick="uploadFile()">Upload File</button>
+    
+    <div id="output">
+      <h2>Generated Images</h2>
+      <div class="output-images" id="outputImages"></div>
+    </div>
+  </div>
+
+  <script>
+    const outputImages = document.getElementById('outputImages');
+
+    // Upload .h5 file and get diffusion results
+    function uploadFile() {
+      const input = document.getElementById('fileInput');
+      const formData = new FormData();
+
+      // Append .h5 file to FormData
+      if (input.files.length > 0) {
+        formData.append('file', input.files[0]);
+      } else {
+        alert('Please select a .h5 file!');
+        return;
+      }
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+        outputImages.innerHTML = '';
+        data.generatedImages.forEach(imageUrl => {
+          const img = document.createElement('img');
+          img.src = imageUrl;
+          outputImages.appendChild(img);
+        });
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
